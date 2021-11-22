@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+from datetime import datetime
+from os import system
+from argparse import ArgumentParser, RawTextHelpFormatter
+from sys import exit
+
+def argparse_epilog():
+   return "Turulomio"
+
+parser=ArgumentParser(
+    description='Launches libreoffice server to run unogenerator code', 
+    epilog=argparse_epilog(), 
+    formatter_class=RawTextHelpFormatter
+)
+__version__="0.1.0"
+parser.add_argument('--version', action='version', version=__version__)
+parser.add_argument('--input', help="Number of concurrent libreoffice instances", action="store")
+parser.add_argument('--output', help="First port assigned to server", action="store", default=None)
+args=parser.parse_args()
+
+init = datetime.now()
+
+
+if args.input==args.output:
+    print("--input and --output can't be the same")
+    exit(1)
+
+if args.output is None:
+    args.output=f"{args.input[:-4]}.mkvcompressor.mkv"
+
+## 0 es sin perdida, menor mejor calidad, mayor menor calidad
+c=f"ffmpeg  -i '{args.input}' -c:v libx265 -scodec srt -crf 20 '{args.output}'"
+
+system(c)
+
+print(f"Process took {datetime.now()-init}")
